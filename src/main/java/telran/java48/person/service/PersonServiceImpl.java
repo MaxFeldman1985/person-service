@@ -1,17 +1,16 @@
 package telran.java48.person.service;
 
-import javax.transaction.Transactional;
-
-import org.apache.tomcat.jni.Address;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import telran.java48.person.dao.PersonRepository;
 import telran.java48.person.dto.AddressDto;
 import telran.java48.person.dto.CityPopulationDto;
-import telran.java48.person.dto.PersonDTO;
-import telran.java48.person.dto.exeption.PersonNotFoundExeption;
+import telran.java48.person.dto.PersonDto;
+import telran.java48.person.dto.exceptions.PersonNotFoundException;
+import telran.java48.person.model.Address;
 import telran.java48.person.model.Person;
 
 @Service
@@ -22,8 +21,8 @@ public class PersonServiceImpl implements PersonService {
 	final ModelMapper modelMapper;
 
 	@Override
-	@org.springframework.transaction.annotation.Transactional
-	public Boolean addPerson(PersonDTO personDto) {
+	@Transactional
+	public Boolean addPerson(PersonDto personDto) {
 		if (personRepository.existsById(personDto.getId())) {
 			return false;
 		}
@@ -32,50 +31,51 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	@Override
-	public PersonDTO findPersonById(Integer id) {
-		Person person = personRepository.findById(id).orElseThrow(PersonNotFoundExeption::new);
-		return modelMapper.map(person, PersonDTO.class);
+	public PersonDto findPersonById(Integer id) {
+		Person person = personRepository.findById(id).orElseThrow(PersonNotFoundException::new);
+		return modelMapper.map(person, PersonDto.class);
 	}
 
 	@Override
-	@org.springframework.transaction.annotation.Transactional
-	public PersonDTO removePerson(Integer id) {
-		Person person = personRepository.findById(id).orElseThrow(PersonNotFoundExeption::new);
-		//personRepository.delete(person);
-		return modelMapper.map(person, PersonDTO.class);
+	@Transactional
+	public PersonDto removePerson(Integer id) {
+		Person person = personRepository.findById(id).orElseThrow(PersonNotFoundException::new);
+		personRepository.delete(person);
+		return modelMapper.map(person, PersonDto.class);
 	}
 
 	@Override
-	@org.springframework.transaction.annotation.Transactional
-	public PersonDTO updatePersonName(Integer id, String name) {
-		Person person = personRepository.findById(id).orElseThrow(PersonNotFoundExeption::new);
+	@Transactional
+	public PersonDto updatePersonName(Integer id, String name) {
+		Person person = personRepository.findById(id).orElseThrow(PersonNotFoundException::new);
 		person.setName(name);
-		//personRepository.save(person);
-		return modelMapper.map(person, PersonDTO.class);
+//		personRepository.save(person);
+		return modelMapper.map(person, PersonDto.class);
 	}
 
 	@Override
-	@org.springframework.transaction.annotation.Transactional
-	public PersonDTO updatePersonAddress(Integer id, AddressDto addressDto) {
-		Person person = personRepository.findById(id).orElseThrow(PersonNotFoundExeption::new);
-		person.setAddress(modelMapper.map(addressDto, telran.java48.person.model.Address.class));
-		return modelMapper.map(person, PersonDTO.class);
+	@Transactional
+	public PersonDto updatePersonAddress(Integer id, AddressDto addressDto) {
+		Person person = personRepository.findById(id).orElseThrow(PersonNotFoundException::new);
+		person.setAddress(modelMapper.map(addressDto, Address.class));
+//		personRepository.save(person);
+		return modelMapper.map(person, PersonDto.class);
 	}
 
 	@Override
-	public Iterable<PersonDTO> findPersonsByCity(String city) {
+	public Iterable<PersonDto> findPersonsByCity(String city) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Iterable<PersonDTO> findPersonsByName(String name) {
+	public Iterable<PersonDto> findPersonsByName(String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Iterable<PersonDTO> findPersonsBetwenAge(Integer minAge, Integer maxAge) {
+	public Iterable<PersonDto> findPersonsBetweenAge(Integer minAge, Integer maxAge) {
 		// TODO Auto-generated method stub
 		return null;
 	}
